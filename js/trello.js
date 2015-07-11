@@ -7,6 +7,11 @@ function Board(title) {
 
   this.lists = [new List(undefined, 'New list...')]
   this.title = title
+  this.node = document.createElement('div')
+  this.titleNode = document.createElement('div')
+  this.listsNode = document.createElement('div')
+  this.titleNode.classList.add('board-title')
+  this.listsNode.classList.add('board-canvas')
 
   this.getNextId = function() {
     return nextId++
@@ -14,29 +19,28 @@ function Board(title) {
 }
 
 Board.prototype.addList = function () {
-// DEBUG:  TODO open lightbox for title input
-  var title = 'New list ' + Math.random()
-    , list = new List(this, title)
-  this.lists.splice(this.lists.length-1, 0, list)
-  // TODO: re-render
 }
 
 Board.prototype.render = function () {
-  var boardEl = document.createElement('div')
-    , boardTitleEl = document.createElement('div')
-    , boardCanvasEl = document.createElement('div')
-    , listEls = []
-  boardTitleEl.classList.add('board-title')
-  boardCanvasEl.classList.add('board-canvas')
-  boardTitleEl.appendChild(document.createTextNode(this.title))
+  this.titleNode.appendChild(document.createTextNode(this.title))
   for (var i = 0; i < this.lists.length; ++i) {
-    listEls[i] = this.lists[i].render()
-    boardCanvasEl.appendChild(listEls[i])
+    this.lists[i].render()
+    this.listsNode.appendChild(this.lists[i].node)
   }
-  listEls[this.lists.length-1].onclick = this.addList // TODO: bind this here
-  boardEl.appendChild(boardTitleEl)
-  boardEl.appendChild(boardCanvasEl)
-  return boardEl
+  this.lists[this.lists.length-1].node.onclick = addList(this)
+  this.node.appendChild(this.titleNode)
+  this.node.appendChild(this.listsNode)
+}
+
+function addList(board) {
+  return function () {
+    // TODO: open lightbox for title input
+    var title = 'New list: ' + (Math.round(Math.random()*1000)).toString()
+     ,  list = new List(board, title)
+    board.lists.splice(board.lists.length-1, 0, list)    
+    list.render()
+    board.listsNode.insertBefore(list.node, board.lists[board.lists.length-1].node)
+  }
 }
 
 Board.prototype.removeList = function () { /* TODO */ }
@@ -50,33 +54,21 @@ function List(board, title) {
   this.board = board
   this.title = title
   this.cards = []
-  
-  // if (newList) {  // for per-board-singleton 'new list' list only
-  //   this.title = 'New list...'
-  //   this.cards = []
-  //   this.click = board.addList()
-  // } else {
-  //   this.title = title
-  //   this.cards = [new Card(this, undefined, true)]
-  //   this.actions = [new Action(board, 'createList', title)]
-  //   this.click = undefined   // no click functionality for existing list
-  // }
+  this.node = document.createElement('div')
+  this.titleNode = document.createElement('div')
+  this.cardsNode = document.createElement('div')
 }
 
 List.prototype.render = function () {
-  var listEl = document.createElement('div')
-    , listTitleEl = document.createElement('div')
-    , listCardsEl = document.createElement('div')
-  listEl.classList.add('list')
-  listTitleEl.classList.add('list-title')
-  listCardsEl.classList.add('list-cards')
-  listTitleEl.appendChild(document.createTextNode(this.title))
+  this.node.classList.add('list')
+  this.titleNode.classList.add('list-title')
+  this.cardsNode.classList.add('list-cards')
+  this.titleNode.appendChild(document.createTextNode(this.title))
   for (var i = 0; i < this.cards.length; ++i) {
-    listCardsEl.appendChild(this.cards[i].render())
+    this.cardsNode.appendChild(this.cards[i].render())
   }
-  listEl.appendChild(listTitleEl)
-  listEl.appendChild(listCardsEl)
-  return listEl
+  this.node.appendChild(this.titleNode)
+  this.node.appendChild(this.cardsNode)
 }
 
 List.prototype.addCard = function () { /* TODO */ }
@@ -145,7 +137,8 @@ function render() {
 
 function buildBoard(containerEl, title) {
   var board = new Board(title)
-  containerEl.appendChild(board.render())
+  board.render()
+  containerEl.appendChild(board.node)
 }
 
 
