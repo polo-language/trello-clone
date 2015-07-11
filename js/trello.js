@@ -10,8 +10,9 @@ function Board(title) {
   this.node = document.createElement('div')
   this.titleNode = document.createElement('div')
   this.listsNode = document.createElement('div')
-  this.titleNode.classList.add('board-title')
-  this.listsNode.classList.add('board-canvas')
+  this.node.id = 'board'
+  this.titleNode.id = 'board-title'
+  this.listsNode.id = 'board-canvas'
 
   this.getNextId = function() {
     return nextId++

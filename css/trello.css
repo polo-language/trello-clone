@@ -1,17 +1,26 @@
 #body {
     font: 14px "Helvetica Neue",Arial,Helvetica,sans-serif;
     line-height: 18px;
-}
-
-.board {
     background-color: #0079BF;
 }
 
-.board-title {
+#board-canvas {
+  -webkit-box-align: start;
+  -webkit-align-items: flex-start;
+  -ms-flex-align: start;
+  align-items: flex-start;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
 }
-
-.board-canvas {}
-
 
 .list {
   background: #e2e4e6;
@@ -36,6 +45,20 @@
   position: relative;
   width: 270px;
   max-width: 270px;
+
+  cursor: pointer;
+}
+
+.list-cards {
+  -webkit-box-flex: 1;
+  -webkit-flex: 1 1 auto;
+  -ms-flex: 1 1 auto;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  margin: 0 4px;
+  padding: 0 4px;
+  z-index: 1;
 }
 
 .card {
