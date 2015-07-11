@@ -28,11 +28,12 @@ Board.prototype.render = function () {
     , listEls = []
   boardTitleEl.classList.add('board-title')
   boardCanvasEl.classList.add('board-canvas')
+  boardTitleEl.appendChild(document.createTextNode(this.title))
   for (var i = 0; i < this.lists.length; ++i) {
     listEls[i] = this.lists[i].render()
     boardCanvasEl.appendChild(listEls[i])
   }
-  listEls[this.lists.length-1].onclick = this.addList
+  listEls[this.lists.length-1].onclick = this.addList // TODO: bind this here
   boardEl.appendChild(boardTitleEl)
   boardEl.appendChild(boardCanvasEl)
   return boardEl
@@ -69,6 +70,7 @@ List.prototype.render = function () {
   listEl.classList.add('list')
   listTitleEl.classList.add('list-title')
   listCardsEl.classList.add('list-cards')
+  listTitleEl.appendChild(document.createTextNode(this.title))
   for (var i = 0; i < this.cards.length; ++i) {
     listCardsEl.appendChild(this.cards[i].render())
   }
