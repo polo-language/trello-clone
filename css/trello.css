@@ -1,16 +1,21 @@
-body {
+html {
+  background-color: #0079BF;
+}
+
+
+body, button, html, input, select, textarea {
+  color: #4d4d4d;
   font: 14px "Helvetica Neue",Arial,Helvetica,sans-serif;
   line-height: 18px;
 }
 
-#board {
-  background-color: #0079BF;
-}
+#board {}
 
 #board-title {
   padding: 10px 8px;
   font-size: 18px;
   line-height: 30px;
+  color: #f6f6f6;
   font-weight: bold;
 }
 
@@ -113,4 +118,7 @@ body {
   min-height: 20px;
   position: relative;
   z-index: 0;
+
+  overflow: auto;
+  padding: 6px 8px 4px;
 }

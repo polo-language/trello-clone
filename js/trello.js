@@ -50,6 +50,7 @@ function addList(board) {
 
     document.getElementById('list-title-submit').onclick = titleButtonClick
     board.titleFormNode.style.display = 'block'
+    titleInput.focus()
     
     function titleButtonClick(evt) {
       evt.preventDefault()
@@ -123,10 +124,10 @@ function addCard(list) {
     list.titleFormNode.getElementsByClassName('newcard-title-submit')[0]
                       .onclick = titleSubmit
     list.titleFormNode.style.display = 'block'
+    titleTextarea.focus()
 
     function titleSubmit(evt) {
       evt.preventDefault()
-      alert('gothere')
       var title = titleTextarea.value.trim()
         , card
 
@@ -159,6 +160,7 @@ function Card(list, title, index) {
   // this.badges = {}
   // this.actions = []
   this.node = buildCardNode()
+  this.node.classList.add('card')
   this.titleNode = this.node.getElementsByClassName('card-title')[0]
   this.descNode = this.node.getElementsByClassName('card-desc')[0]
   this.dueNode = this.node.getElementsByClassName('card-due')[0]
