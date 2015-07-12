@@ -3,7 +3,7 @@
 //////////////////////////////////////////////////////////////////////////
 //// Board
 function Board(title) {
-  var nextId = 0
+  // var nextId = 0
 
   this.lists = [new List(undefined, 'Add a list...', true)]
   this.title = title
@@ -19,13 +19,17 @@ function Board(title) {
   this.node.style.width = document.documentElement.clientWidth
 
   // new list title form
-  this.titleFormNode = document.createElement('div')
-  this.titleFormNode.innerHTML = '<span class="newitem-title-wrapper"><input id="list-title-input" type="text"><button id="list-title-submit" type="button">Add</button></span>'
+  this.titleFormNode = document.createElement('form')
+  this.titleFormNode.innerHTML =
+      '<div class="newitem-title-wrapper">' +
+          '<input id="list-title-input" type="text">' +
+          '<input id="list-title-submit" type="submit" value="Save">' +
+      '</div>'
   this.titleFormNode.style.display = 'none'
   
-  this.getNextId = function() {
-    return nextId++
-  }
+  // this.getNextId = function() {
+  //   return nextId++
+  // }
 }
 
 Board.prototype.render = function () {
@@ -47,17 +51,21 @@ function addList(board) {
     document.getElementById('list-title-submit').onclick = titleButtonClick
     board.titleFormNode.style.display = 'block'
     
-    function titleButtonClick() {
+    function titleButtonClick(evt) {
+      evt.preventDefault()
       var title = titleInput.value.trim()
         , list
-      if (!title) { return }
 
       board.titleFormNode.style.display = 'none'
       titleInput.value = ''
+      if (!title) { return }
+      
+
       list = new List(board, title)
       board.lists.splice(board.lists.length-1, 0, list)    
       list.render()
-      board.listsNode.insertBefore(list.node, board.lists[board.lists.length-1].node)
+      board.listsNode.insertBefore(list.node,
+                                   board.lists[board.lists.length-1].node)
     }
   }
 }
@@ -83,9 +91,13 @@ function List(board, title, dummyList) {
   if (!dummyList) {
     this.cards = [new Card(this, 'Add a card...', 0)]
     // new card title form
-    this.titleFormNode = document.createElement('div')
-    this.titleFormNode.innerHTML = '<span class="newitem-title-wrapper"><input class="newcard-title-input" type="text"><button class="newcard-title-submit" type="button">Add</button></span>'
-    // this.titleFormNode.style.display = 'none'
+    this.titleFormNode = document.createElement('form')
+    this.titleFormNode.innerHTML =
+        '<div class="newitem-title-wrapper">' +
+            '<textarea class="newcard-title-input" type="text"></textarea>' +
+            '<input class="newcard-title-submit" type="submit" value="Add">' +
+        '</div>'
+    this.titleFormNode.style.display = 'none'
   }
 }
 
@@ -105,8 +117,31 @@ List.prototype.render = function () {
 }
 
 function addCard(list) {
-  return function () {}
-  /* TODO */
+  return function () {
+    var titleTextarea = list.titleFormNode
+                            .getElementsByClassName('newcard-title-input')[0]
+    list.titleFormNode.getElementsByClassName('newcard-title-submit')[0]
+                      .onclick = titleSubmit
+    list.titleFormNode.style.display = 'block'
+
+    function titleSubmit(evt) {
+      evt.preventDefault()
+      alert('gothere')
+      var title = titleTextarea.value.trim()
+        , card
+
+      list.titleFormNode.style.display = 'none'
+      titleTextarea.value = ''
+      if (!title) { return }
+
+
+      card = new Card(list, title, list.cards.length)
+      list.cards.push(card)
+      card.render()
+      list.cardsNode.insertBefore(card.node, list.cards[list.cards.length-2].node)
+
+    }
+  }
 }
 
 List.prototype.removeCard = function () { /* TODO */ }
@@ -131,7 +166,10 @@ function Card(list, title, index) {
 
 function buildCardNode() {
   var node = document.createElement('div')
-  node.innerHTML = '<div class="card-title"></div><div class="card-desc"></div><div class="card-due"></div>'
+  node.innerHTML =
+      '<div class="card-title"></div>' +
+      '<div class="card-desc"></div>' +
+      '<div class="card-due"></div>'
   return node
 }
 
