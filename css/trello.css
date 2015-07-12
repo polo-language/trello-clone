@@ -1,7 +1,17 @@
 #body {
-    font: 14px "Helvetica Neue",Arial,Helvetica,sans-serif;
-    line-height: 18px;
-    background-color: #0079BF;
+  font: 14px "Helvetica Neue",Arial,Helvetica,sans-serif;
+  line-height: 18px;
+}
+
+#board {
+  background-color: #0079BF;
+}
+
+#board-title {
+  padding: 10px 8px;
+
+  font-size: 18px;
+  line-height: 30px;
 }
 
 #board-canvas {
@@ -20,6 +30,11 @@
   flex-direction: row;
   margin-bottom: 10px;
   padding-bottom: 10px;
+}
+
+.newitem-title-wrapper {
+  float: right;
+  margin: 4px 10px;
 }
 
 .list {
@@ -47,6 +62,13 @@
   max-width: 270px;
 
   cursor: pointer;
+}
+
+.list-title {
+  min-height: 19px;
+  padding: 8px 34px 8px 10px;
+  font-size: 15px;
+  line-height: 18px;
 }
 
 .list-cards {

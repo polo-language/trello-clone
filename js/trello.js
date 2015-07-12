@@ -7,13 +7,21 @@ function Board(title) {
 
   this.lists = [new List(undefined, 'New list...')]
   this.title = title
+  
   this.node = document.createElement('div')
   this.titleNode = document.createElement('div')
   this.listsNode = document.createElement('div')
+  
   this.node.id = 'board'
   this.titleNode.id = 'board-title'
   this.listsNode.id = 'board-canvas'
+  this.node.style.height = document.documentElement.clientHeight
+  this.node.style.width = document.documentElement.clientWidth
 
+  this.titleFormNode = document.createElement('div')
+  this.titleFormNode.innerHTML = '<span class="newitem-title-wrapper"><input id="list-title-input" type="text"><button id="list-title-submit" type="button">Add</button></span>'
+  this.titleFormNode.style.display = 'none'
+  
   this.getNextId = function() {
     return nextId++
   }
@@ -25,36 +33,30 @@ Board.prototype.render = function () {
     this.lists[i].render()
     this.listsNode.appendChild(this.lists[i].node)
   }
+  this.lists[this.lists.length-1].node.appendChild(this.titleFormNode)
   this.lists[this.lists.length-1].titleNode.onclick = addList(this)
   this.node.appendChild(this.titleNode)
   this.node.appendChild(this.listsNode)
 }
 
 function addList(board) {
-  var titleFormNode = document.createElement('div')
-    , newListList = board.lists[board.lists.length-1].node
-  
-  titleFormNode.innerHTML = '<input id="list-title-input" type="text"><button id="list-title-submit" type="button">Add</button>'
-  titleFormNode.style.display = 'none'
-  newListList.appendChild(titleFormNode)
-  
   return function () {  
     var titleInput = document.getElementById('list-title-input')
 
     document.getElementById('list-title-submit').onclick = titleButtonClick
-    titleFormNode.style.display = 'block'
+    board.titleFormNode.style.display = 'block'
     
     function titleButtonClick() {
       var title = titleInput.value.trim()
         , list
       if (!title) { return }
 
-      titleFormNode.style.display = 'none'
+      board.titleFormNode.style.display = 'none'
       titleInput.value = ''
       list = new List(board, title)
       board.lists.splice(board.lists.length-1, 0, list)    
       list.render()
-      board.listsNode.insertBefore(list.node, newListList)
+      board.listsNode.insertBefore(list.node, board.lists[board.lists.length-1].node)
     }
   }
 }
@@ -90,6 +92,11 @@ List.prototype.render = function () {
 }
 
 function addCard(list) {
+  var titleFormNode = document.createElement('div')
+  
+  titleFormNode.innerHTML = '<span class="newitem-title-wrapper"><input class="newcard-title-input" type="text"><button class="newcard-title-submit" type="button">Add</button></span>'
+  titleFormNode.style.display = 'none'
+  list.cards[0].node.appendChild(titleFormNode)
   return function () {}
   /* TODO */
 }
@@ -110,6 +117,8 @@ function Card(list, title, index) {
   // this.actions = []
   this.node = buildCardNode()
   this.titleNode = this.node.getElementsByClassName('card-title')[0]
+  this.descNode = this.node.getElementsByClassName('card-desc')[0]
+  this.dueNode = this.node.getElementsByClassName('card-due')[0]
 }
 
 function buildCardNode() {
