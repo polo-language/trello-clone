@@ -1,4 +1,4 @@
-#body {
+body {
   font: 14px "Helvetica Neue",Arial,Helvetica,sans-serif;
   line-height: 18px;
 }
@@ -9,9 +9,9 @@
 
 #board-title {
   padding: 10px 8px;
-
   font-size: 18px;
   line-height: 30px;
+  font-weight: bold;
 }
 
 #board-canvas {
@@ -69,6 +69,7 @@
   padding: 8px 34px 8px 10px;
   font-size: 15px;
   line-height: 18px;
+  font-weight: bold;
 }
 
 .list-cards {

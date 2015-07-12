@@ -5,7 +5,7 @@
 function Board(title) {
   var nextId = 0
 
-  this.lists = [new List(undefined, 'New list...')]
+  this.lists = [new List(undefined, 'Add a list...', true)]
   this.title = title
   
   this.node = document.createElement('div')
@@ -18,6 +18,7 @@ function Board(title) {
   this.node.style.height = document.documentElement.clientHeight
   this.node.style.width = document.documentElement.clientWidth
 
+  // new list title form
   this.titleFormNode = document.createElement('div')
   this.titleFormNode.innerHTML = '<span class="newitem-title-wrapper"><input id="list-title-input" type="text"><button id="list-title-submit" type="button">Add</button></span>'
   this.titleFormNode.style.display = 'none'
@@ -68,35 +69,42 @@ Board.prototype.logAction = function (action) { /* TODO */ }
 
 //////////////////////////////////////////////////////////////////////////
 //// List
-function List(board, title) {
+function List(board, title, dummyList) {
   this.board = board
+  this.dummyList = dummyList
   this.title = title
-  this.cards = [new Card(this, 'Add card...', 0)]
   this.node = document.createElement('div')
   this.titleNode = document.createElement('div')
   this.cardsNode = document.createElement('div')
   this.node.classList.add('list')
   this.titleNode.classList.add('list-title')
   this.cardsNode.classList.add('list-cards')
+  
+  if (!dummyList) {
+    this.cards = [new Card(this, 'Add a card...', 0)]
+    // new card title form
+    this.titleFormNode = document.createElement('div')
+    this.titleFormNode.innerHTML = '<span class="newitem-title-wrapper"><input class="newcard-title-input" type="text"><button class="newcard-title-submit" type="button">Add</button></span>'
+    // this.titleFormNode.style.display = 'none'
+  }
 }
 
 List.prototype.render = function () {
   this.titleNode.appendChild(document.createTextNode(this.title))
-  for (var i = 0; i < this.cards.length; ++i) {
-    this.cards[i].render()
-    this.cardsNode.appendChild(this.cards[i].node)
-  }
-  this.cards[0].titleNode.onclick = addCard(this)
   this.node.appendChild(this.titleNode)
-  this.node.appendChild(this.cardsNode)
+  
+  if (!this.dummyList) {
+    for (var i = 0; i < this.cards.length; ++i) {
+      this.cards[i].render()
+      this.cardsNode.appendChild(this.cards[i].node)
+    }
+    this.cards[0].titleNode.onclick = addCard(this)
+    this.node.appendChild(this.cardsNode)
+    this.cards[0].node.appendChild(this.titleFormNode)
+  }
 }
 
 function addCard(list) {
-  var titleFormNode = document.createElement('div')
-  
-  titleFormNode.innerHTML = '<span class="newitem-title-wrapper"><input class="newcard-title-input" type="text"><button class="newcard-title-submit" type="button">Add</button></span>'
-  titleFormNode.style.display = 'none'
-  list.cards[0].node.appendChild(titleFormNode)
   return function () {}
   /* TODO */
 }
@@ -127,7 +135,10 @@ function buildCardNode() {
   return node
 }
 
-Card.prototype.render = function () { /* TODO */ }
+Card.prototype.render = function () {
+  this.titleNode.appendChild(document.createTextNode(this.title))
+  this.node.appendChild(this.titleNode)
+}
 
 Card.prototype.edit = function () { /* TODO */ }
 
