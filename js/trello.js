@@ -34,13 +34,31 @@ Board.prototype.render = function () {
 }
 
 function addList(board) {
-  return function () {
-    // TODO: open lightbox for title input
-    var title = 'New list: ' + (Math.round(Math.random()*1000)).toString()
-     ,  list = new List(board, title)
-    board.lists.splice(board.lists.length-1, 0, list)    
-    list.render()
-    board.listsNode.insertBefore(list.node, board.lists[board.lists.length-1].node)
+  var titleFormNode = document.createElement('div')
+  titleFormNode.innerHTML = '<input id="list-title-input" type="text"><button id="list-title-submit" type="button">Add</button>'
+  
+  return function () {  
+    // TODO: temporarily open input field for title entry
+    // var title = 'New list: ' + (Math.round(Math.random()*1000)).toString()
+    var newListList = board.lists[board.lists.length-1].node
+      , button, titleInput
+
+    titleFormNode.style.display = 'block'
+    newListList.appendChild(titleFormNode)
+    button = document.getElementById('list-title-submit').onclick = titleButtonClick
+    titleInput = document.getElementById('list-title-input')
+    
+    function titleButtonClick() {
+      var title = titleInput.value.trim()
+        , list
+      if (!title) { return }
+
+      list = new List(board, title)
+      board.lists.splice(board.lists.length-1, 0, list)    
+      list.render()
+      board.listsNode.insertBefore(list.node, newListList)
+      titleFormNode.style.display = 'none' // TODO: not working!
+    }
   }
 }
 
