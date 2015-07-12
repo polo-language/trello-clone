@@ -28,7 +28,7 @@ Board.prototype.render = function () {
     this.lists[i].render()
     this.listsNode.appendChild(this.lists[i].node)
   }
-  this.lists[this.lists.length-1].node.onclick = addList(this)
+  this.lists[this.lists.length-1].titleNode.onclick = addList(this)
   this.node.appendChild(this.titleNode)
   this.node.appendChild(this.listsNode)
 }
@@ -38,15 +38,13 @@ function addList(board) {
   titleFormNode.innerHTML = '<input id="list-title-input" type="text"><button id="list-title-submit" type="button">Add</button>'
   
   return function () {  
-    // TODO: temporarily open input field for title entry
-    // var title = 'New list: ' + (Math.round(Math.random()*1000)).toString()
     var newListList = board.lists[board.lists.length-1].node
       , button, titleInput
 
     titleFormNode.style.display = 'block'
     newListList.appendChild(titleFormNode)
-    button = document.getElementById('list-title-submit').onclick = titleButtonClick
     titleInput = document.getElementById('list-title-input')
+    button = document.getElementById('list-title-submit').onclick = titleButtonClick
     
     function titleButtonClick() {
       var title = titleInput.value.trim()
@@ -57,7 +55,8 @@ function addList(board) {
       board.lists.splice(board.lists.length-1, 0, list)    
       list.render()
       board.listsNode.insertBefore(list.node, newListList)
-      titleFormNode.style.display = 'none' // TODO: not working!
+      titleInput.value = ''
+      titleFormNode.style.display = 'none'
     }
   }
 }
