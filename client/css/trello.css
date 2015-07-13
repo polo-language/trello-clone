@@ -2,14 +2,11 @@ html {
   background-color: #0079BF;
 }
 
-
 body, button, html, input, select, textarea {
   color: #4d4d4d;
   font: 14px "Helvetica Neue",Arial,Helvetica,sans-serif;
   line-height: 18px;
 }
-
-#board {}
 
 #board-title {
   padding: 10px 8px;
