@@ -3,10 +3,11 @@
 //////////////////////////////////////////////////////////////////////////
 //// Board
 function Board(title) {
-  // var nextId = 0
+  var nextId = 0
 
-  this.lists = [new List(undefined, 'Add a list...', true)]
   this.title = title
+  this.lists = [new List(undefined, 'Add a list...', true)]
+  this.cards = {}
   
   this.node = document.createElement('div')
   this.titleNode = document.createElement('div')
@@ -27,9 +28,9 @@ function Board(title) {
       '</div>'
   this.titleFormNode.style.display = 'none'
   
-  // this.getNextId = function() {
-  //   return nextId++
-  // }
+  this.getNextId = function() {
+    return '_' + (nextId++).toString()
+  }
 }
 
 Board.prototype.render = function () {
@@ -68,6 +69,14 @@ function addList(board) {
       board.listsNode.insertBefore(list.node,
                                    board.lists[board.lists.length-1].node)
     }
+  }
+}
+
+Board.prototype.registerCard = function (card) {
+  this.cards[card.id] =
+  { card: card
+  , list: card.list
+  , index: card.list.cards.length - 1
   }
 }
 
@@ -114,6 +123,8 @@ List.prototype.render = function () {
     this.cards[0].titleNode.onclick = addCard(this)
     this.node.appendChild(this.cardsNode)
     this.cards[0].node.appendChild(this.titleFormNode)
+    this.cards[0].node.draggable = false
+    this.cards[0].node.ondrop = undefined
   }
 }
 
@@ -135,12 +146,11 @@ function addCard(list) {
       titleTextarea.value = ''
       if (!title) { return }
 
-
       card = new Card(list, title, list.cards.length)
       list.cards.push(card)
       card.render()
+      list.board.registerCard(card)
       list.cardsNode.insertBefore(card.node, list.cards[list.cards.length-2].node)
-
     }
   }
 }
@@ -150,24 +160,64 @@ List.prototype.removeCard = function () { /* TODO */ }
 
 //////////////////////////////////////////////////////////////////////////
 //// Card
-function Card(list, title, index) {
+function Card(list, title) {
+  this.id = list.board.getNextId()
   this.list = list
-  this.index = index
-  // this.id = list.board.getNextId()
   this.title = title
   this.desc = ''
   this.due = undefined
   // this.badges = {}
   // this.actions = []
   this.node = buildCardNode()
-  this.node.classList.add('card')
   this.titleNode = this.node.getElementsByClassName('card-title')[0]
   this.descNode = this.node.getElementsByClassName('card-desc')[0]
   this.dueNode = this.node.getElementsByClassName('card-due')[0]
+  
+  this.node.classList.add('card')
+  this.node.setAttribute('card-id', this.id)
+
+  this.node.ondragstart = (function (id) {
+    return function (evt) {
+      evt.dataTransfer.setData('card-id', id)
+      evt.dataTransfer.effectAllowed = 'move'
+    }
+  }(this.id))
+
+  this.node.ondragover = function (evt) {
+    if (contains(evt.dataTransfer.types, 'card-id')) {
+      evt.preventDefault()
+    }
+  }
+
+  this.node.ondrop = (function (board) {
+    return function (evt) {
+      var id = evt.dataTransfer.getData('card-id')
+        , targetId = evt.target.parentNode.getAttribute('card-id')
+        , source = board.cards[id]
+        , target = board.cards[targetId]
+
+      source.list.cardsNode.removeChild(source.card.node)
+      target.list.cardsNode.insertBefore(source.card.node, target.card.node)
+      source.list.cards.splice(source.index, 1)
+      target.list.cards.splice(target.index+1, 0, source.card)
+      source.card.list = target.list
+      board.cards[id].list = target.list
+      board.cards[id].index = target.index + 1
+      evt.preventDefault()
+    }
+  }(list.board))
+
+  function contains(list, value) {
+    for (var i in list) {
+        if (list[i] === value) { return true }
+    }
+    return false
+  }
 }
 
 function buildCardNode() {
   var node = document.createElement('div')
+  node.draggable = true
   node.innerHTML =
       '<div class="card-title"></div>' +
       '<div class="card-desc"></div>' +
@@ -209,8 +259,8 @@ Action.prototype.getActionDesc = function (type, label) {
 
 //////////////////////////////////////////////////////////////////////////
 //// 'main'
-var bodyEl = document.getElementsByTagName('body')
-bodyEl.onload = render()
+var bodyNode = document.getElementsByTagName('body')
+bodyNode.onload = render()
 
 function render() {
   var containerEl = document.getElementById('container')

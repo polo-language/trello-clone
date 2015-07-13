@@ -38,7 +38,6 @@ body, button, html, input, select, textarea {
 }
 
 .newitem-title-wrapper {
-  /*float: right;*/
   margin: 4px 10px;
 }
 
@@ -73,7 +72,6 @@ body, button, html, input, select, textarea {
   position: relative;
   width: 270px;
   max-width: 270px;
-
   cursor: pointer;
 }
 
@@ -94,7 +92,6 @@ body, button, html, input, select, textarea {
   overflow-x: hidden;
   margin: 0 4px;
   padding: 0 4px;
-  z-index: 1;
 }
 
 .newcard-title-input {
@@ -117,8 +114,6 @@ body, button, html, input, select, textarea {
   max-width: 300px;
   min-height: 20px;
   position: relative;
-  z-index: 0;
-
   overflow: auto;
   padding: 6px 8px 4px;
 }
