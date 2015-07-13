@@ -28,21 +28,19 @@ function Board(title) {
       '</div>'
   this.titleFormNode.style.display = 'none'
   
-  this.getNextId = function() {
-    return '_' + (nextId++).toString()
-  }
-}
-
-Board.prototype.render = function () {
+  // add lists
   this.titleNode.appendChild(document.createTextNode(this.title))
   for (var i = 0; i < this.lists.length; ++i) {
-    this.lists[i].render()
     this.listsNode.appendChild(this.lists[i].node)
   }
   this.lists[this.lists.length-1].node.appendChild(this.titleFormNode)
   this.lists[this.lists.length-1].titleNode.onclick = addList(this)
   this.node.appendChild(this.titleNode)
   this.node.appendChild(this.listsNode)
+
+  this.getNextId = function() {
+    return '_' + (nextId++).toString()
+  }
 }
 
 function addList(board) {
@@ -64,8 +62,7 @@ function addList(board) {
       
 
       list = new List(board, title)
-      board.lists.splice(board.lists.length-1, 0, list)    
-      list.render()
+      board.lists.splice(board.lists.length-1, 0, list)
       board.listsNode.insertBefore(list.node,
                                    board.lists[board.lists.length-1].node)
     }
@@ -97,9 +94,12 @@ function List(board, title, dummyList) {
   this.node.classList.add('list')
   this.titleNode.classList.add('list-title')
   this.cardsNode.classList.add('list-cards')
+  this.titleNode.appendChild(document.createTextNode(this.title))
+  this.node.appendChild(this.titleNode)
   
   if (!dummyList) {
     this.cards = [new Card(this, 'Add a card...', 0)]
+    board.registerCard(this.cards[0])
     // new card title form
     this.titleFormNode = document.createElement('form')
     this.titleFormNode.innerHTML =
@@ -108,23 +108,15 @@ function List(board, title, dummyList) {
             '<input class="newcard-title-submit" type="submit" value="Add">' +
         '</div>'
     this.titleFormNode.style.display = 'none'
-  }
-}
-
-List.prototype.render = function () {
-  this.titleNode.appendChild(document.createTextNode(this.title))
-  this.node.appendChild(this.titleNode)
   
-  if (!this.dummyList) {
     for (var i = 0; i < this.cards.length; ++i) {
-      this.cards[i].render()
       this.cardsNode.appendChild(this.cards[i].node)
     }
     this.cards[0].titleNode.onclick = addCard(this)
     this.node.appendChild(this.cardsNode)
     this.cards[0].node.appendChild(this.titleFormNode)
     this.cards[0].node.draggable = false
-    this.cards[0].node.ondrop = undefined
+    // this.cards[0].node.ondrop = undefined
   }
 }
 
@@ -148,7 +140,6 @@ function addCard(list) {
 
       card = new Card(list, title, list.cards.length)
       list.cards.push(card)
-      card.render()
       list.board.registerCard(card)
       list.cardsNode.insertBefore(card.node, list.cards[list.cards.length-2].node)
     }
@@ -166,8 +157,6 @@ function Card(list, title) {
   this.title = title
   this.desc = ''
   this.due = undefined
-  // this.badges = {}
-  // this.actions = []
   this.node = buildCardNode()
   this.titleNode = this.node.getElementsByClassName('card-title')[0]
   this.descNode = this.node.getElementsByClassName('card-desc')[0]
@@ -175,6 +164,8 @@ function Card(list, title) {
   
   this.node.classList.add('card')
   this.node.setAttribute('card-id', this.id)
+  this.titleNode.appendChild(document.createTextNode(this.title))
+  this.node.appendChild(this.titleNode)
 
   this.node.ondragstart = (function (id) {
     return function (evt) {
@@ -225,11 +216,6 @@ function buildCardNode() {
   return node
 }
 
-Card.prototype.render = function () {
-  this.titleNode.appendChild(document.createTextNode(this.title))
-  this.node.appendChild(this.titleNode)
-}
-
 Card.prototype.edit = function () { /* TODO */ }
 
 
@@ -259,25 +245,9 @@ Action.prototype.getActionDesc = function (type, label) {
 
 //////////////////////////////////////////////////////////////////////////
 //// 'main'
-var bodyNode = document.getElementsByTagName('body')
-bodyNode.onload = render()
-
-function render() {
-  var containerEl = document.getElementById('container')
-  var title = 'New Board'   // TODO input title
-  buildBoard(containerEl, title)
+document.body.onload = function () {
+  var title = 'New Board'   // TODO: input title
+    , board = new Board(title)
+  
+  document.getElementById('container').appendChild(board.node)
 }
-
-function buildBoard(containerEl, title) {
-  var board = new Board(title)
-  board.render()
-  containerEl.appendChild(board.node)
-}
-
-
-//////////////////////////////////////////////////////////////////////////
-//// Utilities
-
-// function getNow() {
-//   return (new Date()).toISOString()
-// }
