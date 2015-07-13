@@ -74,11 +74,11 @@ function addList(board) {
   }
 }
 
-Board.prototype.registerCard = function (card) {
+Board.prototype.registerCard = function (card, index) {
   this.cards[card.id] =
   { card: card
   , list: card.list
-  , index: card.list.cards.length - 1
+  , index: index
   }
 }
 
@@ -105,7 +105,7 @@ function List(board, title, dummyList) {
   if (!dummyList) {
     var dummyCard = new Card(this, 'Add a card...', 0)
     this.cards = [dummyCard]
-    board.registerCard(this.cards[0])
+    board.registerCard(this.cards[0], 0)
 
     // new card title form
     this.titleFormNode = buildCardTitleForm()
@@ -149,11 +149,10 @@ function addCard(list) {
       titleTextarea.value = ''
       if (!title) { return }
 
-      card = new Card(list, title, list.cards.length)
+      card = new Card(list, title)
+      list.board.registerCard(card, list.cards.length)
+      list.cardsNode.insertBefore(card.node, list.cards[list.cards.length-1].node)
       list.cards.push(card)
-      list.board.registerCard(card)
-console.log('list.cards.length: ' + list.cards.length)
-      list.cardsNode.insertBefore(card.node, list.cards[list.cards.length-2].node)
     }
   }
 }
@@ -198,14 +197,20 @@ function Card(list, title) {
         , targetId = this.getAttribute('card-id')
         , source = board.cards[id]
         , target = board.cards[targetId]
+        , i
 
       source.list.cardsNode.removeChild(source.card.node)
       target.list.cardsNode.insertBefore(source.card.node, target.card.node)
+      for (i = source.index + 1; i < source.list.cards.length; ++i) {
+        board.registerCard(source.list.cards[i], i - 1)
+      }
       source.list.cards.splice(source.index, 1)
-      target.list.cards.splice(target.index+1, 0, source.card)
+      for (i = target.index + 1; i < target.list.cards.length; ++i) {
+        board.registerCard(target.list.cards[i], i + 1)
+      }
+      target.list.cards.splice(target.index + 1, 0, source.card)
       source.card.list = target.list
-      board.cards[id].list = target.list
-      board.cards[id].index = target.index + 1
+      board.registerCard(source.card, target.index + 1)
       evt.preventDefault()
     }
   }(list.board))
