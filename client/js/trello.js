@@ -20,13 +20,7 @@ function Board(title) {
   this.node.style.width = document.documentElement.clientWidth
 
   // new list title form
-  this.titleFormNode = document.createElement('form')
-  this.titleFormNode.innerHTML =
-      '<div class="newitem-title-wrapper">' +
-          '<input id="list-title-input" type="text">' +
-          '<input id="list-title-submit" type="submit" value="Save">' +
-      '</div>'
-  this.titleFormNode.style.display = 'none'
+  this.titleFormNode = buildListTitleFormNode()
   
   // add lists
   this.titleNode.appendChild(document.createTextNode(this.title))
@@ -41,6 +35,17 @@ function Board(title) {
   this.getNextId = function() {
     return '_' + (nextId++).toString()
   }
+}
+
+function buildListTitleFormNode() {
+  var node = document.createElement('form')
+  node.innerHTML =
+      '<div class="newitem-title-wrapper">' +
+          '<input id="list-title-input" type="text">' +
+          '<input id="list-title-submit" type="submit" value="Save">' +
+      '</div>'
+  node.style.display = 'none'
+  return node
 }
 
 function addList(board) {
