@@ -20,7 +20,7 @@ function Board(title) {
   this.node.style.width = document.documentElement.clientWidth
 
   // new list title form
-  this.titleFormNode = buildListTitleFormNode()
+  this.titleFormNode = buildListTitleForm()
   
   // add lists
   this.titleNode.appendChild(document.createTextNode(this.title))
@@ -37,7 +37,7 @@ function Board(title) {
   }
 }
 
-function buildListTitleFormNode() {
+function buildListTitleForm() {
   var node = document.createElement('form')
   node.innerHTML =
       '<div class="newitem-title-wrapper">' +
@@ -103,26 +103,32 @@ function List(board, title, dummyList) {
   this.node.appendChild(this.titleNode)
   
   if (!dummyList) {
-    this.cards = [new Card(this, 'Add a card...', 0)]
+    var dummyCard = new Card(this, 'Add a card...', 0)
+    this.cards = [dummyCard]
     board.registerCard(this.cards[0])
+
     // new card title form
-    this.titleFormNode = document.createElement('form')
-    this.titleFormNode.innerHTML =
-        '<div class="newitem-title-wrapper">' +
-            '<textarea class="newcard-title-input" type="text"></textarea>' +
-            '<input class="newcard-title-submit" type="submit" value="Add">' +
-        '</div>'
-    this.titleFormNode.style.display = 'none'
+    this.titleFormNode = buildCardTitleForm()
   
     for (var i = 0; i < this.cards.length; ++i) {
       this.cardsNode.appendChild(this.cards[i].node)
     }
-    this.cards[0].titleNode.onclick = addCard(this)
+    dummyCard.titleNode.onclick = addCard(this)
     this.node.appendChild(this.cardsNode)
-    this.cards[0].node.appendChild(this.titleFormNode)
-    this.cards[0].node.draggable = false
-    // this.cards[0].node.ondrop = undefined
+    dummyCard.node.appendChild(this.titleFormNode)
+    dummyCard.node.draggable = false
   }
+}
+
+function buildCardTitleForm() {
+  var node = document.createElement('form')
+  node.innerHTML =
+      '<div class="newitem-title-wrapper">' +
+          '<textarea class="newcard-title-input" type="text"></textarea>' +
+          '<input class="newcard-title-submit" type="submit" value="Add">' +
+      '</div>'
+  node.style.display = 'none'
+  return node
 }
 
 function addCard(list) {
@@ -146,6 +152,7 @@ function addCard(list) {
       card = new Card(list, title, list.cards.length)
       list.cards.push(card)
       list.board.registerCard(card)
+console.log('list.cards.length: ' + list.cards.length)
       list.cardsNode.insertBefore(card.node, list.cards[list.cards.length-2].node)
     }
   }
@@ -188,7 +195,7 @@ function Card(list, title) {
   this.node.ondrop = (function (board) {
     return function (evt) {
       var id = evt.dataTransfer.getData('card-id')
-        , targetId = evt.target.parentNode.getAttribute('card-id')
+        , targetId = this.getAttribute('card-id')
         , source = board.cards[id]
         , target = board.cards[targetId]
 
