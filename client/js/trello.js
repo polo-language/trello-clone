@@ -209,6 +209,8 @@ function Card(list, title) {
   this.node.onclick = (function (card) {
     return function () {
       cardEdit.card = card
+      cardEdit.titleNode.value = card.title
+      cardEdit.dueNode.value = card.due
       cardEdit.show()
     }
   }(this))
@@ -229,15 +231,15 @@ function buildCardNode() {
 var cardEdit = 
 { node: document.getElementById('card-edit')
 , windowOverlay: document.getElementById('window-overlay')
-, title: document.getElementById('card-edit-title')
-, due: document.getElementById('card-edit-due')
+, titleNode: document.getElementById('card-edit-title')
+, dueNode: document.getElementById('card-edit-due')
 , card: undefined
 }
 
 
 cardEdit.clearInputs = function () {
-  cardEdit.title.value = ''
-  cardEdit.due.value = ''
+  cardEdit.titleNode.value = ''
+  cardEdit.dueNode.value = ''
 }
 
 cardEdit.close = function() {
@@ -256,14 +258,16 @@ document.getElementById('card-edit-close').onclick = cardEdit.close
 
 document.getElementById('card-edit-submit').onclick = function (evt) {
   evt.preventDefault()
-  var title = cardEdit.title.value.trim()
-    , due = cardEdit.due.value
+  var title = cardEdit.titleNode.value.trim()
+    , due = cardEdit.dueNode.value
 
   if (title) {
+    cardEdit.card.title = title
     cardEdit.card.titleNode.replaceChild(document.createTextNode(title),
                                          cardEdit.card.titleNode.childNodes[0])
   }
   if (due) {
+    cardEdit.card.due = due
     if (cardEdit.card.dueNode.childNodes.length > 0) {
       cardEdit.card.dueNode.replaceChild(document.createTextNode('Due on: ' + due),
                                          cardEdit.card.dueNode.childNodes[0])
