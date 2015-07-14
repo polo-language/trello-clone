@@ -3,10 +3,36 @@
     <head>
         <meta charset="utf-8" />
         <link rel="stylesheet" type="text/css" href="css/trello.css" />
+        <link rel="icon" type="image/x-icon" href="images/favicon.ico" />
         <title>Trello-clone</title>
     </head>
     <body>
         <div id="container"></div>
+
+        <div id="window-overlay"></div>
+
+        <div id="card-edit">
+          <div id="card-edit-close"><img src="images/close_x.png"></div>
+          <form>
+            <div id="card-edit-inputs">
+              <div>
+                <label>Title:</label>
+                <input id="card-edit-title">
+              </div>
+              <div>
+                <label>Description:</label>
+                <input id="card-edit-desc">
+              </div>
+              <div>
+                <label>Due Date:</label>
+                <input id="card-edit-due" type="date">
+              </div>
+            </div>
+            <div>
+              <input id="card-edit-submit" type="submit" value="Save">
+            </div>
+          </form>
+        </div>
     </body>
     
     <script type="text/javascript" src="js/trello.js"></script>

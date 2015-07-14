@@ -114,3 +114,60 @@ body, button, html, input, select, textarea {
   overflow: auto;
   padding: 6px 8px 4px;
 }
+
+#card-edit {
+  display: none;
+  position: absolute;
+  width: 600px;
+  /*height: 200px;*/
+  z-index: 15;
+  top: 50px;
+  left: 50%;
+  margin: 0px 0 0 -300px;
+  padding: 50px;
+  border-radius: 3px;
+  background-color: #e2e4e6;
+}
+
+#card-edit div {
+  margin-bottom: 10px;
+}
+
+#card-edit label {
+  display: inline-block;
+  width: 100px;
+  margin-right: 20px;
+}
+
+#card-edit-inputs input {
+  width: 300px;
+}
+
+#card-edit-close {
+  float: right;
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  cursor: pointer;
+}
+
+#card-edit-close img {
+  width: 20px;
+  height: 20px;
+}
+
+#card-edit-submit {
+  float: right;
+  width: 70px;
+}
+
+#window-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background-color: rgba(0,0,0,.6);
+  z-index: 10;
+}

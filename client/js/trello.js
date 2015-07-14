@@ -117,6 +117,7 @@ function List(board, title, dummyList) {
     this.node.appendChild(this.cardsNode)
     dummyCard.node.appendChild(this.titleFormNode)
     dummyCard.node.draggable = false
+    dummyCard.node.onclick = undefined
   }
 }
 
@@ -194,7 +195,7 @@ function Card(list, title) {
   this.node.ondrop = (function (board) {
     return function (evt) {
       var id = evt.dataTransfer.getData('card-id')
-        , targetId = this.getAttribute('card-id')
+        , targetId = this.getAttribute('card-id') // 'this' is target of drop
         , source = board.cards[id]
         , target = board.cards[targetId]
         , i
@@ -215,11 +216,9 @@ function Card(list, title) {
     }
   }(list.board))
 
-  function contains(list, value) {
-    for (var i in list) {
-        if (list[i] === value) { return true }
-    }
-    return false
+  this.node.onclick = function () {
+    windowOverlay.style.display = 'block'
+    cardEdit.style.display = 'block'
   }
 }
 
@@ -234,6 +233,30 @@ function buildCardNode() {
 }
 
 Card.prototype.edit = function () { /* TODO */ }
+
+
+//////////////////////////////////////////////////////////////////////////
+//// Card edit
+var cardEdit = document.getElementById('card-edit')
+  , windowOverlay = document.getElementById('window-overlay')
+
+document.getElementById('card-edit-close').onclick = cardEditClose
+
+function cardEditClose() {
+  cardEdit.style.display = 'none'
+  windowOverlay.style.display = 'none'
+}
+
+document.getElementById('card-edit-submit').onclick = function (evt) {
+  evt.preventDefault()
+  // TODO: save data to clicked card
+}
+
+window.onkeydown = function(evt) {
+  if (evt.keyCode === 27 ) {
+    cardEditClose()
+  }
+}
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -257,6 +280,23 @@ Action.prototype.getActionDesc = function (type, label) {
   }
   return ACTION_STRINGS[type].replace('{desc}', label) +
          ' at ' + this.date.toLocaleTimeString();
+}
+
+
+//////////////////////////////////////////////////////////////////////////
+//// Utilities
+function contains(list, value) {
+  for (var i in list) {
+      if (list[i] === value) { return true }
+  }
+  return false
+}
+
+function clearInputs(parent) {
+  var inputs = parent.getElementsByTagName('input')
+  for (var i in inputs) {
+    inputs[i].value = ''
+  }
 }
 
 
