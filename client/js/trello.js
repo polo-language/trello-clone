@@ -64,7 +64,6 @@ function addList(board) {
       board.titleFormNode.style.display = 'none'
       titleInput.value = ''
       if (!title) { return }
-      
 
       list = new List(board, title)
       board.lists.splice(board.lists.length-1, 0, list)
@@ -81,10 +80,6 @@ Board.prototype.registerCard = function (card, index) {
   , index: index
   }
 }
-
-Board.prototype.removeList = function () { /* TODO */ }
-
-Board.prototype.logAction = function (action) { /* TODO */ }
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -158,8 +153,6 @@ function addCard(list) {
   }
 }
 
-List.prototype.removeCard = function () { /* TODO */ }
-
 
 //////////////////////////////////////////////////////////////////////////
 //// Card
@@ -167,17 +160,14 @@ function Card(list, title) {
   this.id = list.board.getNextId()
   this.list = list
   this.title = title
-  this.desc = ''
   this.due = undefined
   this.node = buildCardNode()
   this.titleNode = this.node.getElementsByClassName('card-title')[0]
-  this.descNode = this.node.getElementsByClassName('card-desc')[0]
   this.dueNode = this.node.getElementsByClassName('card-due')[0]
   
   this.node.classList.add('card')
   this.node.setAttribute('card-id', this.id)
   this.titleNode.appendChild(document.createTextNode(this.title))
-  this.node.appendChild(this.titleNode)
 
   this.node.ondragstart = (function (id) {
     return function (evt) {
@@ -216,10 +206,12 @@ function Card(list, title) {
     }
   }(list.board))
 
-  this.node.onclick = function () {
-    windowOverlay.style.display = 'block'
-    cardEdit.style.display = 'block'
-  }
+  this.node.onclick = (function (card) {
+    return function () {
+      cardEdit.card = card
+      cardEdit.show()
+    }
+  }(this))
 }
 
 function buildCardNode() {
@@ -227,34 +219,64 @@ function buildCardNode() {
   node.draggable = true
   node.innerHTML =
       '<div class="card-title"></div>' +
-      '<div class="card-desc"></div>' +
       '<div class="card-due"></div>'
   return node
 }
 
-Card.prototype.edit = function () { /* TODO */ }
-
 
 //////////////////////////////////////////////////////////////////////////
 //// Card edit
-var cardEdit = document.getElementById('card-edit')
-  , windowOverlay = document.getElementById('window-overlay')
-
-document.getElementById('card-edit-close').onclick = cardEditClose
-
-function cardEditClose() {
-  cardEdit.style.display = 'none'
-  windowOverlay.style.display = 'none'
+var cardEdit = 
+{ node: document.getElementById('card-edit')
+, windowOverlay: document.getElementById('window-overlay')
+, title: document.getElementById('card-edit-title')
+, due: document.getElementById('card-edit-due')
+, card: undefined
 }
+
+
+cardEdit.clearInputs = function () {
+  cardEdit.title.value = ''
+  cardEdit.due.value = ''
+}
+
+cardEdit.close = function() {
+  cardEdit.card = undefined
+  cardEdit.clearInputs()
+  cardEdit.node.style.display = 'none'
+  cardEdit.windowOverlay.style.display = 'none'
+}
+
+cardEdit.show = function () {
+  cardEdit.windowOverlay.style.display = 'block'
+  cardEdit.node.style.display = 'block'
+}
+
+document.getElementById('card-edit-close').onclick = cardEdit.close
 
 document.getElementById('card-edit-submit').onclick = function (evt) {
   evt.preventDefault()
-  // TODO: save data to clicked card
+  var title = cardEdit.title.value.trim()
+    , due = cardEdit.due.value
+
+  if (title) {
+    cardEdit.card.titleNode.replaceChild(document.createTextNode(title),
+                                         cardEdit.card.titleNode.childNodes[0])
+  }
+  if (due) {
+    if (cardEdit.card.dueNode.childNodes.length > 0) {
+      cardEdit.card.dueNode.replaceChild(document.createTextNode('Due on: ' + due),
+                                         cardEdit.card.dueNode.childNodes[0])
+    } else {
+      cardEdit.card.dueNode.appendChild(document.createTextNode('Due on: ' + due))
+    }
+  }
+  cardEdit.close()
 }
 
 window.onkeydown = function(evt) {
   if (evt.keyCode === 27 ) {
-    cardEditClose()
+    cardEdit.close()
   }
 }
 
@@ -292,19 +314,15 @@ function contains(list, value) {
   return false
 }
 
-function clearInputs(parent) {
-  var inputs = parent.getElementsByTagName('input')
-  for (var i in inputs) {
-    inputs[i].value = ''
-  }
-}
-
 
 //////////////////////////////////////////////////////////////////////////
 //// 'main'
+var currentBoard
+
 document.body.onload = function () {
-  var title = 'New Board'   // TODO: input title
+  var title = 'New Board'
     , board = new Board(title)
   
   document.getElementById('container').appendChild(board.node)
+  currentBoard = board
 }

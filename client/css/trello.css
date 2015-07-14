@@ -115,6 +115,10 @@ body, button, html, input, select, textarea {
   padding: 6px 8px 4px;
 }
 
+.card div {
+  margin-bottom: 5px;
+}
+
 #card-edit {
   display: none;
   position: absolute;
