@@ -81,6 +81,16 @@ Board.prototype.registerCard = function (card, index) {
   }
 }
 
+Board.prototype.reregisterSubsequent = function (list, index, shift) {
+  for (var i = index; i < list.cards.length; ++i) {
+    this.registerCard(list.cards[i], i + shift)
+  }
+}
+
+Board.prototype.unregisterCard = function (card) {
+  delete this.cards[card.id]
+}
+
 
 //////////////////////////////////////////////////////////////////////////
 //// List
@@ -192,14 +202,13 @@ function Card(list, title) {
 
       source.list.cardsNode.removeChild(source.card.node)
       target.list.cardsNode.insertBefore(source.card.node, target.card.node)
-      for (i = source.index + 1; i < source.list.cards.length; ++i) {
-        board.registerCard(source.list.cards[i], i - 1)
-      }
+
+      board.reregisterSubsequent(source.list, source.index + 1, -1)
       source.list.cards.splice(source.index, 1)
-      for (i = target.index + 1; i < target.list.cards.length; ++i) {
-        board.registerCard(target.list.cards[i], i + 1)
-      }
+
+      board.reregisterSubsequent(target.list, target.index + 1, 1)
       target.list.cards.splice(target.index + 1, 0, source.card)
+
       source.card.list = target.list
       board.registerCard(source.card, target.index + 1)
       evt.preventDefault()
@@ -215,7 +224,7 @@ function Card(list, title) {
     return function () {
       cardEdit.card = card
       cardEdit.titleNode.value = card.title
-      cardEdit.dueNode.value = card.due
+      cardEdit.dueNode.value = card.due || '' // use empty string if undefined (IE)
       cardEdit.show()
     }
   }(this))
@@ -265,7 +274,7 @@ cardEdit.show = function () {
   cardEdit.node.style.display = 'block'
 }
 
-cardEdit.submmit = function (evt) {
+cardEdit.submit = function (evt) {
   evt.preventDefault()
   var title = cardEdit.titleNode.value.trim()
     , due = cardEdit.dueNode.value
@@ -289,7 +298,23 @@ cardEdit.submmit = function (evt) {
 
 document.getElementById('card-edit-close').onclick = cardEdit.close
 
-document.getElementById('card-edit-submit').onclick = cardEdit.submmit
+document.getElementById('card-edit-submit').onclick = cardEdit.submit
+
+document.getElementById('card-edit-delete').onclick = function () {
+  var index = currentBoard.cards[cardEdit.card.id].index
+console.log(cardEdit.card.list.cards.length + ': ' + index)
+
+  currentBoard.unregisterCard(cardEdit.card)
+  currentBoard.reregisterSubsequent(cardEdit.card.list, index + 1, -1)
+
+  cardEdit.card.list.cardsNode.removeChild(cardEdit.card.node)
+  cardEdit.card.list.cards.splice(index, 1)
+  
+  cardEdit.close()
+  cardEdit.card = undefined
+}
+
+cardEdit.windowOverlay.onclick = cardEdit.close
 
 window.onkeydown = function(evt) {
   if (evt.keyCode === 27 ) {
@@ -319,16 +344,6 @@ Action.prototype.getActionDesc = function (type, label) {
   }
   return ACTION_STRINGS[type].replace('{desc}', label) +
          ' at ' + this.date.toLocaleTimeString();
-}
-
-
-//////////////////////////////////////////////////////////////////////////
-//// Utilities
-function contains(list, value) {
-  for (var i in list) {
-      if (list[i] === value) { return true }
-  }
-  return false
 }
 
 
