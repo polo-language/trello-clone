@@ -171,20 +171,20 @@ function Card(list, title) {
 
   this.node.ondragstart = (function (id) {
     return function (evt) {
-      evt.dataTransfer.setData('card-id', id)
+      dragTracker.id = id
       evt.dataTransfer.effectAllowed = 'move'
     }
   }(this.id))
 
   this.node.ondragover = function (evt) {
-    if (contains(evt.dataTransfer.types, 'card-id')) {
+    if (dragTracker.id) {
       evt.preventDefault()
     }
   }
 
   this.node.ondrop = (function (board) {
     return function (evt) {
-      var id = evt.dataTransfer.getData('card-id')
+      var id = dragTracker.id
         , targetId = this.getAttribute('card-id') // 'this' is target of drop
         , source = board.cards[id]
         , target = board.cards[targetId]
@@ -206,6 +206,11 @@ function Card(list, title) {
     }
   }(list.board))
 
+  this.node.ondragend = function () {
+    dragTracker.id = undefined
+  }
+
+  // click opens card editing panel
   this.node.onclick = (function (card) {
     return function () {
       cardEdit.card = card
@@ -227,6 +232,13 @@ function buildCardNode() {
 
 
 //////////////////////////////////////////////////////////////////////////
+//// Drag tracking
+var dragTracker = {
+  id: undefined
+}
+
+
+//////////////////////////////////////////////////////////////////////////
 //// Card edit
 var cardEdit = 
 { node: document.getElementById('card-edit')
@@ -235,7 +247,6 @@ var cardEdit =
 , dueNode: document.getElementById('card-edit-due')
 , card: undefined
 }
-
 
 cardEdit.clearInputs = function () {
   cardEdit.titleNode.value = ''
@@ -254,9 +265,7 @@ cardEdit.show = function () {
   cardEdit.node.style.display = 'block'
 }
 
-document.getElementById('card-edit-close').onclick = cardEdit.close
-
-document.getElementById('card-edit-submit').onclick = function (evt) {
+cardEdit.submmit = function (evt) {
   evt.preventDefault()
   var title = cardEdit.titleNode.value.trim()
     , due = cardEdit.dueNode.value
@@ -277,6 +286,10 @@ document.getElementById('card-edit-submit').onclick = function (evt) {
   }
   cardEdit.close()
 }
+
+document.getElementById('card-edit-close').onclick = cardEdit.close
+
+document.getElementById('card-edit-submit').onclick = cardEdit.submmit
 
 window.onkeydown = function(evt) {
   if (evt.keyCode === 27 ) {
